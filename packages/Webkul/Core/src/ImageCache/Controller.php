@@ -99,6 +99,33 @@ class Controller extends ImageCacheController
     }
 
     /**
+     * Returns full image path from given filename.
+     *
+     * Ensures tenant storage paths are checked when tenancy suffixes storage_path().
+     *
+     * @param  string  $filename
+     * @return string
+     */
+    protected function getImagePath($filename)
+    {
+        $paths = config('imagecache.paths', []);
+        $paths = array_values(array_unique(array_merge($paths, [
+            storage_path('app/public'),
+            public_path('storage'),
+        ])));
+
+        foreach ($paths as $path) {
+            $imagePath = $path.'/'.str_replace('..', '', $filename);
+
+            if (file_exists($imagePath) && is_file($imagePath)) {
+                return $imagePath;
+            }
+        }
+
+        abort(404);
+    }
+
+    /**
      * Builds HTTP response from given image data
      *
      * @param  string  $content
