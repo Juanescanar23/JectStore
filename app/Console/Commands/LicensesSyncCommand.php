@@ -40,7 +40,7 @@ final class LicensesSyncCommand extends Command
                     // Suspender todas las tiendas de esa licencia
                     Tenant::query()
                         ->where('license_id', $license->id)
-                        ->update(['suspended_at' => $now->toDateTimeString()]);
+                        ->update(['license_suspended_at' => $now->toDateTimeString()]);
 
                     if ($billing) {
                         $billing->status = $state === 'cancelled' ? 'canceled' : $state;
@@ -61,7 +61,7 @@ final class LicensesSyncCommand extends Command
                 // Si esta active/grace, levantamos suspension (si la suspension fue por license)
                 Tenant::query()
                     ->where('license_id', $license->id)
-                    ->update(['suspended_at' => null]);
+                    ->update(['license_suspended_at' => null]);
             });
         }
 

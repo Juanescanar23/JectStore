@@ -6,43 +6,31 @@ namespace App\Http\Controllers\Landlord\Portal;
 
 use App\Http\Controllers\Controller;
 use App\Models\Landlord\License;
-use App\Models\Landlord\LicenseBilling;
 use App\Services\Billing\DLocalGo\LicenseCheckoutService;
+use App\Services\Portal\PortalBillingSummaryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 final class BillingController extends Controller
 {
-    public function status()
+    public function status(PortalBillingSummaryService $summaryService)
     {
         $user = Auth::guard('landlord')->user();
-        $license = License::query()
-            ->where('account_id', $user->account_id)
-            ->orderByDesc('expires_at')
-            ->firstOrFail();
+        $summary = $summaryService->buildForUser($user)->toArray();
 
-        $billing = LicenseBilling::query()
-            ->where('license_id', $license->id)
-            ->where('provider', 'dlocalgo')
-            ->first();
+        return response()->json($summary);
+    }
 
-        return response()->json([
-            'license' => [
-                'id' => $license->id,
-                'status' => $license->status,
-                'starts_at' => $license->starts_at,
-                'expires_at' => $license->expires_at,
-                'grace_days' => $license->grace_days,
-            ],
-            'billing' => $billing ? [
-                'status' => $billing->status,
-                'current_period_end' => $billing->current_period_end,
-                'subscribe_url' => $billing->subscribe_url,
-                'day_of_month' => $billing->day_of_month,
-                'cycles_paid' => $billing->cycles_paid,
-                'max_periods' => $billing->max_periods,
-            ] : null,
-        ]);
+    public function index(PortalBillingSummaryService $summaryService)
+    {
+        $user = Auth::guard('landlord')->user();
+        $summary = $summaryService->buildForUser($user)->toArray();
+
+        if (request()->expectsJson()) {
+            return response()->json($summary);
+        }
+
+        return view('portal.billing', compact('summary'));
     }
 
     public function checkout(Request $request, LicenseCheckoutService $service)

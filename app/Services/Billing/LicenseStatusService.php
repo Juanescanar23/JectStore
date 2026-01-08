@@ -49,8 +49,8 @@ final class LicenseStatusService
         DB::connection('landlord')
             ->table('tenants')
             ->where('license_id', $license->id)
-            ->whereNull('suspended_at')
-            ->update(['suspended_at' => $now->toDateTimeString()]);
+            ->whereNull('license_suspended_at')
+            ->update(['license_suspended_at' => $now->toDateTimeString()]);
     }
 
     private function unsuspendTenants(License $license): void
@@ -58,7 +58,7 @@ final class LicenseStatusService
         DB::connection('landlord')
             ->table('tenants')
             ->where('license_id', $license->id)
-            ->whereNotNull('suspended_at')
-            ->update(['suspended_at' => null]);
+            ->whereNotNull('license_suspended_at')
+            ->update(['license_suspended_at' => null]);
     }
 }

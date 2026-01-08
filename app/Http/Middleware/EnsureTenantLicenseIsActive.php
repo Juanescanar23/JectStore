@@ -17,7 +17,7 @@ final class EnsureTenantLicenseIsActive
             return $next($request);
         }
 
-        if (! empty($tenant->suspended_at)) {
+        if (! empty($tenant->license_suspended_at) || ! empty($tenant->store_suspended_at)) {
             abort(403);
         }
 

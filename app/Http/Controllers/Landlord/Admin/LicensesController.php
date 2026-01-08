@@ -19,16 +19,22 @@ class LicensesController extends Controller
     {
         $data = $request->validate([
             'starts_at' => ['required', 'date'],
+            'amount' => ['nullable', 'numeric', 'min:0'],
+            'currency' => ['nullable', 'string', 'size:3'],
         ]);
 
         $startsAt = CarbonImmutable::parse($data['starts_at']);
         $expiresAt = $startsAt->addMonthsNoOverflow(12);
+        $amount = isset($data['amount']) ? (float) $data['amount'] : (float) config('billing.dlocalgo.default_amount', 0);
+        $currency = strtoupper((string) ($data['currency'] ?? config('billing.dlocalgo.default_currency', 'USD')));
 
         License::create([
             'account_id' => $account->id,
             'plan_code' => 'standard_100',
             'plan_name' => 'Standard 100',
             'max_tenants' => 100,
+            'amount' => $amount,
+            'currency' => $currency,
             'starts_at' => $data['starts_at'],
             'expires_at' => $expiresAt->toDateTimeString(),
             'status' => 'active',

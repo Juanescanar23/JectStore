@@ -34,7 +34,18 @@ final class LicenseBillingService
             $dayOfMonth = (int) $startsAt->day;
             $notificationUrl = rtrim((string) config('app.url'), '/') . '/webhooks/dlocalgo?license_id=' . $license->getKey();
 
-            $currency = (string) config('billing.dlocalgo.default_currency', 'USD');
+            $defaultAmount = (float) config('billing.dlocalgo.default_amount', 0.0);
+            $amount = isset($license->amount) ? (float) $license->amount : $defaultAmount;
+            if ($amount <= 0) {
+                $amount = $defaultAmount;
+            }
+
+            $currency = trim((string) ($license->currency ?? ''));
+            if ($currency === '') {
+                $currency = (string) config('billing.dlocalgo.default_currency', 'USD');
+            }
+            $currency = strtoupper($currency);
+
             $country = (string) config('billing.dlocalgo.default_country', '');
 
             $payload = [
@@ -45,7 +56,7 @@ final class LicenseBillingService
                 'max_periods' => 12,
                 'notification_url' => $notificationUrl,
                 'currency' => $currency,
-                'amount' => (float) config('billing.dlocalgo.default_amount', 0.0),
+                'amount' => $amount,
             ];
 
             if ($country !== '') {

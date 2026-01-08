@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withCommands([
         App\Console\Commands\CreateTenant::class,
         App\Console\Commands\LicensesSyncCommand::class,
+        App\Console\Commands\StoreSuspensionCommand::class,
     ])
     ->withProviders([
         App\Providers\TenancyServiceProvider::class,

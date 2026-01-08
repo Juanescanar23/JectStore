@@ -37,7 +37,8 @@ Route::middleware(['auth:landlord', 'portal.license'])
 Route::middleware(['auth:landlord', 'portal.license'])
     ->prefix('portal')
     ->group(function () {
-        Route::get('/billing', [BillingController::class, 'status']);
+        Route::get('/billing', [BillingController::class, 'index'])->name('portal.billing');
+        Route::get('/billing/status', [BillingController::class, 'status'])->name('portal.billing.status');
         Route::post('/billing/dlocal/checkout', [BillingController::class, 'checkout']);
     });
 

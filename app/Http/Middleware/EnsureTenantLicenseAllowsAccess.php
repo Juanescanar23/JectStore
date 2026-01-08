@@ -21,8 +21,8 @@ final class EnsureTenantLicenseAllowsAccess
             abort(404);
         }
 
-        // Si el tenant ya esta suspendido por nosotros, no seguir
-        if (! empty($tenant->suspended_at) || ! empty($tenant->deactivated_at)) {
+        // Si el tenant ya esta suspendido por licencia o por MP, no seguir
+        if (! empty($tenant->license_suspended_at) || ! empty($tenant->store_suspended_at) || ! empty($tenant->deactivated_at)) {
             abort(402, 'Tienda suspendida.');
         }
 

@@ -1,2 +1,6 @@
 *
 !.gitignore
+!landlord/
+!landlord/**
+!portal/
+!portal/**

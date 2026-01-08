@@ -22,7 +22,10 @@ class AuthController extends Controller
 
         if (Auth::guard('landlord')->attempt($credentials, true)) {
             $request->session()->regenerate();
-            return redirect()->intended('/admin');
+            $user = Auth::guard('landlord')->user();
+            $defaultRedirect = ($user && $user->role === 'superadmin') ? '/admin' : '/portal/billing';
+
+            return redirect()->intended($defaultRedirect);
         }
 
         return back()->withErrors([

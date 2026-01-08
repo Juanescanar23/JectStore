@@ -24,6 +24,19 @@ class AccountUsersController extends Controller
             'role' => ['required', 'in:account_owner,account_manager'],
         ]);
 
+        if ($data['role'] === 'account_owner') {
+            $ownersCount = LandlordUser::query()
+                ->where('account_id', $account->id)
+                ->where('role', 'account_owner')
+                ->count();
+
+            if ($ownersCount >= 3) {
+                return back()
+                    ->withErrors(['role' => 'Limite de 3 owners alcanzado.'])
+                    ->withInput();
+            }
+        }
+
         LandlordUser::create([
             'account_id' => $account->id,
             'name' => $data['name'],

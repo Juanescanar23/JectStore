@@ -15,6 +15,8 @@ class License extends Model
         'plan_code',
         'plan_name',
         'max_tenants',
+        'amount',
+        'currency',
         'starts_at',
         'expires_at',
         'status',
@@ -25,6 +27,7 @@ class License extends Model
     protected $casts = [
         'starts_at' => 'datetime',
         'expires_at' => 'datetime',
+        'amount' => 'decimal:2',
     ];
 
     public function account(): BelongsTo
