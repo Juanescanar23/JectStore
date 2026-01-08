@@ -20,8 +20,9 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 Route::middleware([
     'web',
-    PreventAccessFromCentralDomains::class,
     InitializeTenancyByDomain::class,
+    PreventAccessFromCentralDomains::class,
+    'tenant.license',
 ])->group(function () {
-    require base_path('routes/web.php');
+    require base_path('routes/tenant-web.php');
 });

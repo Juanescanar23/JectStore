@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Barryvdh\Debugbar\Facades\Debugbar;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Facades\Request;
@@ -33,8 +34,12 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
+    public function boot(Router $router): void
     {
+        $this->app->booted(function () use ($router) {
+            $router->prependMiddlewareToGroup('shop', \App\Http\Middleware\PreventCentralDomainShopAccess::class);
+        });
+
         ParallelTesting::setUpTestDatabase(function (string $database, int $token) {
             Artisan::call('db:seed');
         });

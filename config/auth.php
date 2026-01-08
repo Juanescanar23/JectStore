@@ -45,6 +45,11 @@ return [
             'driver'   => 'session',
             'provider' => 'admins',
         ],
+
+        'landlord' => [
+            'driver'   => 'session',
+            'provider' => 'landlord_users',
+        ],
     ],
 
     /*
@@ -73,6 +78,11 @@ return [
         'admins' => [
             'driver' => 'eloquent',
             'model'  => Webkul\User\Models\Admin::class,
+        ],
+
+        'landlord_users' => [
+            'driver' => 'eloquent',
+            'model'  => App\Models\Landlord\LandlordUser::class,
         ],
     ],
 

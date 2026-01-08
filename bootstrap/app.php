@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Middleware\EncryptCookies;
-use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Cookie\Middleware\EncryptCookies as BaseEncryptCookies;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -19,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withCommands([
         App\Console\Commands\CreateTenant::class,
+        App\Console\Commands\LicensesSyncCommand::class,
     ])
     ->withProviders([
         App\Providers\TenancyServiceProvider::class,
@@ -39,20 +39,23 @@ return Application::configure(basePath: dirname(__DIR__))
          */
         $middleware->remove(ConvertEmptyStringsToNull::class);
 
+        $middleware->prepend(\App\Http\Middleware\InitializeTenancyByDomainIfExists::class);
+        $middleware->prependToGroup('web', \App\Http\Middleware\PreventCentralDomainShopAccess::class);
+
         $middleware->append(SecureHeaders::class);
         $middleware->append(CanInstall::class);
 
-        // Primero bloqueamos dominios centrales, luego inicializamos tenancy por dominio.
-        $middleware->append(\Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class);
-        $middleware->append(\Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class);
+        $middleware->alias([
+            'role' => \App\Http\Middleware\EnsureLandlordRole::class,
+            'landlord.license' => \App\Http\Middleware\EnsureLandlordLicenseIsActive::class,
+            'portal.license' => \App\Http\Middleware\EnsurePortalLicenseAllowsAccess::class,
+            'tenant.license' => \App\Http\Middleware\EnsureTenantLicenseAllowsAccess::class,
+        ]);
 
         /**
          * Add the overridden middleware at the end of the list.
          */
         $middleware->replaceInGroup('web', BaseEncryptCookies::class, EncryptCookies::class);
-    })
-    ->withSchedule(function (Schedule $schedule) {
-        //
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

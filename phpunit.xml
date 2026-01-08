@@ -6,6 +6,14 @@
     colors="true"
 >
     <testsuites>
+        <!-- Application testsuites. -->
+        <testsuite name="App Feature Test">
+            <directory suffix="Test.php">tests/Feature</directory>
+        </testsuite>
+        <testsuite name="App Unit Test">
+            <directory suffix="Test.php">tests/Unit</directory>
+        </testsuite>
+
         <!-- Admin package testsuites. -->
         <testsuite name="Admin Feature Test">
             <directory suffix="Test.php">packages/Webkul/Admin/tests/Feature</directory>

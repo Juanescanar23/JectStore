@@ -2,6 +2,14 @@
 
 use Illuminate\Support\Str;
 
+$mysqlSslCaAttr = defined('Pdo\\MySQL::ATTR_SSL_CA')
+    ? \Pdo\MySQL::ATTR_SSL_CA
+    : (defined('PDO::MYSQL_ATTR_SSL_CA') ? \PDO::MYSQL_ATTR_SSL_CA : null);
+$mysqlSslCaOptions = [];
+if ($mysqlSslCaAttr !== null) {
+    $mysqlSslCaOptions[$mysqlSslCaAttr] = env('MYSQL_ATTR_SSL_CA');
+}
+
 return [
 
     /*
@@ -57,9 +65,7 @@ return [
             'prefix_indexes' => true,
             'strict'         => false,
             'engine'         => null,
-            'options'        => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'options'        => extension_loaded('pdo_mysql') ? array_filter($mysqlSslCaOptions) : [],
         ],
 
         'landlord' => [
@@ -77,9 +83,7 @@ return [
             'prefix_indexes' => true,
             'strict'         => false,
             'engine'         => null,
-            'options'        => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'options'        => extension_loaded('pdo_mysql') ? array_filter($mysqlSslCaOptions) : [],
         ],
 
         'tenant' => [
@@ -96,9 +100,7 @@ return [
             'prefix_indexes' => true,
             'strict'         => false,
             'engine'         => null,
-            'options'        => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'options'        => extension_loaded('pdo_mysql') ? array_filter($mysqlSslCaOptions) : [],
         ],
 
         'mariadb' => [
@@ -116,9 +118,7 @@ return [
             'prefix_indexes' => true,
             'strict'         => false,
             'engine'         => null,
-            'options'        => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'options'        => extension_loaded('pdo_mysql') ? array_filter($mysqlSslCaOptions) : [],
         ],
 
         'pgsql' => [
