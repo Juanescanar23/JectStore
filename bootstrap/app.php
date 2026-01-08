@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         App\Console\Commands\CreateTenant::class,
         App\Console\Commands\LicensesSyncCommand::class,
         App\Console\Commands\StoreSuspensionCommand::class,
+        App\Console\Commands\StoreSubscriptionsSyncCommand::class,
     ])
     ->withProviders([
         App\Providers\TenancyServiceProvider::class,
@@ -51,6 +52,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'landlord.license' => \App\Http\Middleware\EnsureLandlordLicenseIsActive::class,
             'portal.license' => \App\Http\Middleware\EnsurePortalLicenseAllowsAccess::class,
             'tenant.license' => \App\Http\Middleware\EnsureTenantLicenseAllowsAccess::class,
+        ]);
+
+        $middleware->validateCsrfTokens(except: [
+            'webhooks/*',
         ]);
 
         /**

@@ -261,13 +261,30 @@ return [
     ],
 
     /**
+     * Payments.
+     */
+    [
+        'key'        => 'payments',
+        'name'       => 'Pagos',
+        'route'      => 'admin.payments.mercadopago.index',
+        'sort'       => 8,
+        'icon'       => 'icon-sales',
+    ], [
+        'key'        => 'payments.mercadopago',
+        'name'       => 'Mercado Pago',
+        'route'      => 'admin.payments.mercadopago.index',
+        'sort'       => 1,
+        'icon'       => '',
+    ],
+
+    /**
      * Settings.
      */
     [
         'key'        => 'settings',
         'name'       => 'admin::app.components.layouts.sidebar.settings',
         'route'      => 'admin.settings.locales.index',
-        'sort'       => 8,
+        'sort'       => 9,
         'icon'       => 'icon-settings',
         'icon-class' => 'settings-icon',
     ], [

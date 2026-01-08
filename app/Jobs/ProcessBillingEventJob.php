@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Models\Landlord\BillingEvent;
+use App\Models\Landlord\AccountProviderConfig;
 use App\Models\Landlord\License;
 use App\Models\Landlord\LicenseBilling;
 use App\Services\Billing\DLocalGo\DLocalGoClient;
 use App\Services\Billing\DLocalGo\LicenseBillingService;
 use App\Services\Billing\LicenseStatusService;
+use App\Services\Billing\MercadoPago\StoreSubscriptionService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -48,6 +50,9 @@ final class ProcessBillingEventJob implements ShouldQueue
         try {
             if ($event->provider === 'dlocalgo') {
                 $this->handleDlocalGo($event);
+            }
+            if ($event->provider === 'mercadopago') {
+                $this->handleMercadoPago($event);
             }
 
             if ($event->status === 'failed') {
@@ -108,5 +113,34 @@ final class ProcessBillingEventJob implements ShouldQueue
                 'status' => $billingStatus,
                 'updated_at' => now(),
             ]);
+    }
+
+    private function handleMercadoPago(BillingEvent $event): void
+    {
+        if (! $event->provider_event_id) {
+            $event->status = 'failed';
+            $event->error_message = 'missing preapproval id';
+            return;
+        }
+
+        if (! $event->account_id) {
+            $event->status = 'failed';
+            $event->error_message = 'missing account id';
+            return;
+        }
+
+        $config = AccountProviderConfig::query()
+            ->where('account_id', $event->account_id)
+            ->where('provider', 'mercadopago')
+            ->first();
+
+        if (! $config) {
+            $event->status = 'failed';
+            $event->error_message = 'account mercadopago not configured';
+            return;
+        }
+
+        $service = new StoreSubscriptionService($config);
+        $service->fetchAndSync((string) $event->provider_event_id, $event->tenant_id);
     }
 }

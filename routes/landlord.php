@@ -10,8 +10,10 @@ use App\Http\Controllers\Landlord\Admin\LicensesController;
 use App\Http\Controllers\Landlord\Admin\AccountUsersController;
 use App\Http\Controllers\Landlord\Billing\LicensePaymentController;
 use App\Http\Controllers\Landlord\Portal\BillingController;
+use App\Http\Controllers\Landlord\Portal\MercadoPagoController;
 use App\Http\Controllers\Landlord\Webhooks\DLocalGoWebhookController;
 use App\Http\Controllers\Landlord\Webhooks\MercadoPagoWebhookController;
+use App\Http\Controllers\Landlord\Webhooks\MercadoPagoStoreWebhookController;
 
 foreach ((array) config('tenancy.central_domains', []) as $domain) {
     Route::domain($domain)->get('/', function () {
@@ -22,6 +24,7 @@ foreach ((array) config('tenancy.central_domains', []) as $domain) {
 Route::get('/__landlord_ping', fn() => response('landlord ok', 200));
 
 Route::post('/webhooks/dlocalgo', DLocalGoWebhookController::class)->name('webhooks.dlocalgo');
+Route::post('/webhooks/mercadopago/{tenantId}', MercadoPagoStoreWebhookController::class)->name('webhooks.mercadopago.store');
 Route::post('/webhooks/mercadopago', MercadoPagoWebhookController::class)->name('webhooks.mercadopago');
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -40,6 +43,10 @@ Route::middleware(['auth:landlord', 'portal.license'])
         Route::get('/billing', [BillingController::class, 'index'])->name('portal.billing');
         Route::get('/billing/status', [BillingController::class, 'status'])->name('portal.billing.status');
         Route::post('/billing/dlocal/checkout', [BillingController::class, 'checkout']);
+
+        Route::get('/payments/mercadopago', [MercadoPagoController::class, 'index'])->name('portal.mercadopago');
+        Route::post('/payments/mercadopago', [MercadoPagoController::class, 'store']);
+        Route::post('/payments/mercadopago/subscribe/{tenantId}', [MercadoPagoController::class, 'subscribe']);
     });
 
 Route::middleware(['auth:landlord', 'role:superadmin', 'portal.license'])

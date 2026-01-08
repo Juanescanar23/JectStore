@@ -15,6 +15,12 @@ final class EnsureTenantLicenseAllowsAccess
 {
     public function handle(Request $request, Closure $next)
     {
+        $path = ltrim($request->path(), '/');
+
+        if ($path === 'storage' || str_starts_with($path, 'storage/')) {
+            return $next($request);
+        }
+
         $tenant = tenancy()->tenant;
 
         if (! $tenant) {

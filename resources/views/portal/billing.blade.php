@@ -476,6 +476,8 @@
     if ($state === 'grace' && $paymentStatus === 'past_due') {
         $paymentStatusLabel = 'grace (past_due)';
     }
+    $isBilling = request()->is('portal/billing*');
+    $isMp = request()->is('portal/payments/mercadopago*');
   @endphp
 
   <div class="shell">
@@ -488,7 +490,8 @@
         </div>
       </div>
       <nav class="nav">
-        <a class="active" href="/portal/billing">Billing</a>
+        <a class="{{ $isBilling ? 'active' : '' }}" href="/portal/billing">Billing</a>
+        <a class="{{ $isMp ? 'active' : '' }}" href="/portal/payments/mercadopago">Mercado Pago</a>
       </nav>
       <form method="POST" action="/logout" class="logout">
         @csrf

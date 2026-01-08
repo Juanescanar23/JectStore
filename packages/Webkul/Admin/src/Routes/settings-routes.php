@@ -12,6 +12,7 @@ use Webkul\Admin\Http\Controllers\Settings\Tax\TaxCategoryController;
 use Webkul\Admin\Http\Controllers\Settings\Tax\TaxRateController;
 use Webkul\Admin\Http\Controllers\Settings\ThemeController;
 use Webkul\Admin\Http\Controllers\Settings\UserController;
+use App\Http\Controllers\Tenant\Admin\MercadoPagoController;
 
 /**
  * Settings routes.
@@ -223,4 +224,13 @@ Route::prefix('settings')->group(function () {
             Route::get('download-error-report/{id}', 'downloadErrorReport')->name('admin.settings.data_transfer.imports.download_error_report');
         });
     });
+});
+
+/**
+ * Payments routes.
+ */
+Route::controller(MercadoPagoController::class)->prefix('payments/mercadopago')->group(function () {
+    Route::get('', 'index')->name('admin.payments.mercadopago.index');
+
+    Route::post('', 'store')->name('admin.payments.mercadopago.store');
 });

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Tenant\Checkout\MercadoPagoController;
 use Webkul\Shop\Http\Controllers\CartController;
 use Webkul\Shop\Http\Controllers\OnepageController;
 
@@ -16,3 +17,6 @@ Route::controller(OnepageController::class)->prefix('checkout/onepage')->group(f
 
     Route::get('success', 'success')->name('shop.checkout.onepage.success');
 });
+
+Route::get('checkout/mercadopago/redirect', [MercadoPagoController::class, 'redirect'])
+    ->name('shop.mercadopago.redirect');

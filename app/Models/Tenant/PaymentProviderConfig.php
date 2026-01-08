@@ -21,4 +21,14 @@ final class PaymentProviderConfig extends Model
     {
         return Crypt::decryptString($this->access_token);
     }
+
+    public function getPublicKeyPlain(): ?string
+    {
+        return $this->public_key ? Crypt::decryptString($this->public_key) : null;
+    }
+
+    public function getWebhookSecretPlain(): ?string
+    {
+        return $this->webhook_secret ? Crypt::decryptString($this->webhook_secret) : null;
+    }
 }
