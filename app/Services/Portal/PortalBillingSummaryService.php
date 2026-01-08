@@ -24,7 +24,11 @@ final class PortalBillingSummaryService
     {
         $account = $user->account_id ? Account::query()->find($user->account_id) : null;
         $license = $account
-            ? License::query()->where('account_id', $account->id)->orderByDesc('expires_at')->first()
+            ? License::query()
+                ->with('plan')
+                ->where('account_id', $account->id)
+                ->orderByDesc('expires_at')
+                ->first()
             : null;
         $billing = $license
             ? LicenseBilling::query()->where('license_id', $license->id)->where('provider', 'dlocalgo')->first()
@@ -57,8 +61,11 @@ final class PortalBillingSummaryService
             $periodStart = $periodEnd->subMonthNoOverflow()->startOfDay();
         }
 
-        $graceDays = (int) ($billing->grace_days ?? $license->grace_days ?? 5);
-        $graceEndsAt = $periodEnd ? BillingCycle::graceEndsAt($periodEnd, $graceDays) : null;
+        $graceDaysRaw = $billing?->grace_days ?? $license?->grace_days;
+        $graceDays = $graceDaysRaw === null ? null : (int) $graceDaysRaw;
+        $graceEndsAt = ($periodEnd && $graceDays !== null)
+            ? BillingCycle::graceEndsAt($periodEnd, $graceDays)
+            : null;
         $daysRemaining = $graceEndsAt ? max(0, $now->diffInDays($graceEndsAt, false)) : null;
         $nextDueDate = $periodEnd;
 
@@ -101,8 +108,8 @@ final class PortalBillingSummaryService
             'subscribe_url' => $billing?->subscribe_url,
             'day_of_month' => $anchorDay,
             'cycles_paid' => $billing?->cycles_paid,
-            'max_periods' => $billing?->max_periods ?? 12,
-            'grace_days' => $billing?->grace_days ?? $license->grace_days ?? 5,
+            'max_periods' => $billing?->max_periods ?? $license->contract_months,
+            'grace_days' => $billing?->grace_days ?? $license->grace_days,
             'last_paid_at' => $billing?->last_paid_at,
             'last_payment_id' => $billing?->last_payment_id,
         ] : null;
@@ -116,11 +123,17 @@ final class PortalBillingSummaryService
             ] : null,
             'license' => $license ? [
                 'id' => $license->id,
+                'plan' => $license->plan ? [
+                    'id' => $license->plan->id,
+                    'code' => $license->plan->code,
+                    'name' => $license->plan->name,
+                ] : null,
                 'plan_code' => $license->plan_code,
                 'plan_name' => $license->plan_name,
                 'max_tenants' => $license->max_tenants,
-                'amount' => $license->amount,
+                'price_usd' => $license->price_usd,
                 'currency' => $license->currency,
+                'contract_months' => $license->contract_months,
                 'starts_at' => $license->starts_at,
                 'expires_at' => $license->expires_at,
                 'status' => $license->status,

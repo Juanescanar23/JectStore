@@ -179,11 +179,11 @@ final class MercadoPagoController extends Controller
             ->orderByDesc('expires_at')
             ->first();
 
-        if (! $license || $license->amount <= 0 || ! $license->max_tenants) {
+        if (! $license || $license->price_usd <= 0 || ! $license->max_tenants) {
             return null;
         }
 
-        return round(((float) $license->amount) / max(1, (int) $license->max_tenants), 2);
+        return round(((float) $license->price_usd) / max(1, (int) $license->max_tenants), 2);
     }
 
     private function domainsByTenant(array $tenantIds): Collection

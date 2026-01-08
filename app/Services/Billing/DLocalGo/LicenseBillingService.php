@@ -34,26 +34,28 @@ final class LicenseBillingService
             $dayOfMonth = (int) $startsAt->day;
             $notificationUrl = rtrim((string) config('app.url'), '/') . '/webhooks/dlocalgo?license_id=' . $license->getKey();
 
-            $defaultAmount = (float) config('billing.dlocalgo.default_amount', 0.0);
-            $amount = isset($license->amount) ? (float) $license->amount : $defaultAmount;
+            $amount = (float) ($license->price_usd ?? 0);
             if ($amount <= 0) {
-                $amount = $defaultAmount;
+                throw new \RuntimeException('License price_usd missing.');
             }
 
-            $currency = trim((string) ($license->currency ?? ''));
+            $currency = strtoupper(trim((string) ($license->currency ?? '')));
             if ($currency === '') {
-                $currency = (string) config('billing.dlocalgo.default_currency', 'USD');
+                throw new \RuntimeException('License currency missing.');
             }
-            $currency = strtoupper($currency);
 
             $country = (string) config('billing.dlocalgo.default_country', '');
+            $maxPeriods = (int) ($license->contract_months ?? 0);
+            if ($maxPeriods <= 0) {
+                throw new \RuntimeException('License contract_months missing.');
+            }
 
             $payload = [
                 'name' => 'JectStore License #' . $license->id,
                 'description' => 'License billing for account ' . $license->account_id,
                 'frequency_type' => 'MONTHLY',
                 'day_of_month' => $dayOfMonth,
-                'max_periods' => 12,
+                'max_periods' => $maxPeriods,
                 'notification_url' => $notificationUrl,
                 'currency' => $currency,
                 'amount' => $amount,
@@ -74,8 +76,11 @@ final class LicenseBillingService
             $billing->plan_token = $plan['plan_token'] ?? null;
             $billing->subscribe_url = $plan['subscribe_url'] ?? null;
             $billing->day_of_month = $dayOfMonth;
-            $billing->max_periods = 12;
+            $billing->max_periods = $maxPeriods;
             $billing->status = $billing->status ?: 'past_due';
+            if ($billing->grace_days === null && $license->grace_days !== null) {
+                $billing->grace_days = (int) $license->grace_days;
+            }
             if (! $billing->current_period_start || ! $billing->current_period_end) {
                 $periodStart = $license->starts_at ? CarbonImmutable::parse($license->starts_at) : CarbonImmutable::now();
                 $billing->current_period_start = $periodStart->toDateTimeString();
@@ -107,11 +112,16 @@ final class LicenseBillingService
                 ->where('provider', 'dlocalgo')
                 ->first();
 
+            $maxPeriods = (int) ($license->contract_months ?? 0);
+            if ($maxPeriods <= 0) {
+                throw new \RuntimeException('License contract_months missing.');
+            }
+
             $billing = $billing ?: new LicenseBilling([
                 'license_id' => $license->id,
                 'provider' => 'dlocalgo',
-                'max_periods' => 12,
-                'grace_days' => $license->grace_days ?: 5,
+                'max_periods' => $maxPeriods,
+                'grace_days' => (int) ($license->grace_days ?? 0),
             ]);
 
             $anchorDay = $billing->day_of_month

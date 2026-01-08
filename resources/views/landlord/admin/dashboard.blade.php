@@ -19,6 +19,18 @@
 
     <div class="card">
       <div class="card-head">
+        <h3>Planes</h3>
+        <span class="badge">Comercial</span>
+      </div>
+      <p class="muted">Define precios, limites y condiciones para nuevas licencias.</p>
+      <div class="card-actions">
+        <a class="button" href="/admin/plans">Ver planes</a>
+        <a class="button-secondary" href="/admin/plans/create">Crear plan</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
         <h3>Licencias</h3>
         <span class="badge">Billing</span>
       </div>

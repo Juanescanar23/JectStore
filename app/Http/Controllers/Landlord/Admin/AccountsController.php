@@ -37,7 +37,7 @@ class AccountsController extends Controller
 
     public function show(Account $account)
     {
-        $licenses = $account->licenses()->latest()->get();
+        $licenses = $account->licenses()->with('plan')->latest()->get();
         $users = $account->users()->latest()->get();
 
         return view('landlord.admin.accounts.show', compact('account', 'licenses', 'users'));

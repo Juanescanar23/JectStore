@@ -363,7 +363,7 @@
     $tenantsCount = (int) ($usage['tenants_count'] ?? 0);
     $maxTenants = (int) ($usage['max_tenants'] ?? 0);
     $usagePercent = $maxTenants > 0 ? min(100, (int) round(($tenantsCount / $maxTenants) * 100)) : 0;
-    $amountLabel = $license ? number_format((float) $license['amount'], 2) . ' ' . strtoupper((string) $license['currency']) : '-';
+    $amountLabel = $license ? number_format((float) $license['price_usd'], 2) . ' ' . strtoupper((string) $license['currency']) : '-';
   @endphp
 
   <div class="shell">

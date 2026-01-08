@@ -304,7 +304,8 @@
     }
 
     input,
-    select {
+    select,
+    textarea {
       width: 100%;
       padding: 12px 14px;
       border-radius: var(--radius-md);
@@ -314,8 +315,14 @@
       transition: border 0.2s ease, box-shadow 0.2s ease;
     }
 
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
     input:focus,
-    select:focus {
+    select:focus,
+    textarea:focus {
       outline: none;
       border-color: rgba(255, 122, 89, 0.8);
       box-shadow: 0 0 0 4px rgba(255, 122, 89, 0.15);
@@ -375,6 +382,13 @@
       margin: 4px 0 0;
       color: var(--muted);
       font-size: 13px;
+    }
+
+    .actions {
+      display: grid;
+      gap: 8px;
+      align-items: center;
+      text-align: right;
     }
 
     footer {
@@ -439,6 +453,7 @@
       <nav class="nav">
         <a href="/admin" class="{{ request()->is('admin') ? 'active' : '' }}">Dashboard</a>
         <a href="/admin/accounts" class="{{ request()->is('admin/accounts*') ? 'active' : '' }}">Accounts</a>
+        <a href="/admin/plans" class="{{ request()->is('admin/plans*') ? 'active' : '' }}">Planes</a>
       </nav>
       <form method="POST" action="/logout" class="logout">
         @csrf

@@ -8,6 +8,7 @@ use App\Http\Controllers\Landlord\Admin\DashboardController;
 use App\Http\Controllers\Landlord\Admin\AccountsController;
 use App\Http\Controllers\Landlord\Admin\LicensesController;
 use App\Http\Controllers\Landlord\Admin\AccountUsersController;
+use App\Http\Controllers\Landlord\Admin\PlansController;
 use App\Http\Controllers\Landlord\Billing\LicensePaymentController;
 use App\Http\Controllers\Landlord\Portal\BillingController;
 use App\Http\Controllers\Landlord\Portal\MercadoPagoController;
@@ -61,7 +62,15 @@ Route::middleware(['auth:landlord', 'role:superadmin', 'portal.license'])
 
         Route::get('/accounts/{account}/licenses/create', [LicensesController::class, 'create']);
         Route::post('/accounts/{account}/licenses', [LicensesController::class, 'store']);
+        Route::get('/accounts/{account}/licenses/{license}/edit', [LicensesController::class, 'edit']);
+        Route::put('/accounts/{account}/licenses/{license}', [LicensesController::class, 'update']);
 
         Route::get('/accounts/{account}/users/create', [AccountUsersController::class, 'create']);
         Route::post('/accounts/{account}/users', [AccountUsersController::class, 'store']);
+
+        Route::get('/plans', [PlansController::class, 'index']);
+        Route::get('/plans/create', [PlansController::class, 'create']);
+        Route::post('/plans', [PlansController::class, 'store']);
+        Route::get('/plans/{plan}/edit', [PlansController::class, 'edit']);
+        Route::put('/plans/{plan}', [PlansController::class, 'update']);
     });

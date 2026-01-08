@@ -32,10 +32,13 @@
         @forelse($licenses as $l)
           <div class="list-row">
             <div>
-              <strong>{{ $l->plan_code }}</strong>
-              <p>{{ $l->starts_at }} -> {{ $l->expires_at }} · max {{ $l->max_tenants }}</p>
+              <strong>{{ $l->plan?->name ?? $l->plan_name ?? $l->plan_code }}</strong>
+              <p>{{ $l->starts_at }} -> {{ $l->expires_at }} · {{ number_format((float) ($l->price_usd ?? $l->amount ?? 0), 2) }} {{ strtoupper((string) ($l->currency ?? 'USD')) }} · max {{ $l->max_tenants }}</p>
             </div>
-            <span class="badge {{ $l->status === 'active' ? 'badge-success' : 'badge-warning' }}">{{ $l->status }}</span>
+            <div class="actions">
+              <span class="badge {{ $l->status === 'active' ? 'badge-success' : 'badge-warning' }}">{{ $l->status }}</span>
+              <a class="button-secondary" href="/admin/accounts/{{ $account->id }}/licenses/{{ $l->id }}/edit">Editar</a>
+            </div>
           </div>
         @empty
           <div class="list-row">

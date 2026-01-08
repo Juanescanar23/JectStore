@@ -457,9 +457,12 @@
         }
     };
 
-    $planName = $license['plan_name'] ?? $license['plan_code'] ?? '-';
+    $planName = $license['plan']['name']
+      ?? $license['plan_name']
+      ?? $license['plan_code']
+      ?? '-';
     $maxTenants = (int) ($license['max_tenants'] ?? 0);
-    $amountValue = $hasLicense && isset($license['amount']) ? number_format((float) $license['amount'], 2) : null;
+    $amountValue = $hasLicense && isset($license['price_usd']) ? number_format((float) $license['price_usd'], 2) : null;
     $currency = strtoupper((string) ($license['currency'] ?? ''));
     $amountLabel = $amountValue ? $amountValue . ' ' . $currency : '-';
 
