@@ -28,6 +28,9 @@ RUN cd packages/Webkul/Installer \
 FROM php:8.2-cli-bookworm AS app
 WORKDIR /app
 
+RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     git \

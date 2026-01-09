@@ -1,35 +1,24 @@
-.git
-.git2
-.gitignore
-.github
-.vscode
+# Ignore everything by default
+**
 
-.env
-.env.*
-*.log
-.phpunit.result.cache
+# Allow only what we need to build/run Laravel+Bagisto
+!app/**
+!bootstrap/**
+!config/**
+!database/**
+!packages/**
+!public/**
+!resources/**
+!routes/**
+!lang/**
 
-node_modules
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+!artisan
+!composer.json
+!composer.lock
+!package.json
+!package-lock.json
+!vite.config.*
+!phpunit.xml
 
-vendor
-
-public/build
-public/fonts
-public/themes/**/build
-
-storage/logs
-storage/framework/cache
-storage/framework/sessions
-storage/framework/views
-
-bootstrap/cache
-
-tests
-packages/**/tests
-docs
-*.md
-
-.DS_Store
+!Dockerfile
+!.dockerignore
