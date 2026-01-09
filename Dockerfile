@@ -2,17 +2,34 @@
 
 FROM node:20-alpine AS node-build
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+
+COPY package.json package-lock.json vite.config.js ./
 COPY resources/ resources/
-COPY public/ public/
-COPY vite.config.js ./
+RUN npm ci
+RUN mkdir -p public
 RUN npm run build
+
+COPY packages/Webkul/Admin packages/Webkul/Admin
+RUN cd packages/Webkul/Admin \
+    && npm install --no-audit --no-fund \
+    && npm run build
+
+COPY packages/Webkul/Shop packages/Webkul/Shop
+RUN cd packages/Webkul/Shop \
+    && npm install --no-audit --no-fund \
+    && npm run build
+
+COPY packages/Webkul/Installer packages/Webkul/Installer
+RUN cd packages/Webkul/Installer \
+    && npm install --no-audit --no-fund \
+    && npm run build
 
 FROM php:8.2-cli-bookworm AS app
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
     git \
     unzip \
     libcurl4-openssl-dev \
@@ -43,9 +60,22 @@ COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
 
 COPY . .
 COPY --from=node-build /app/public/build /app/public/build
+COPY --from=node-build /app/public/themes/admin/default/build /app/public/themes/admin/default/build
+COPY --from=node-build /app/public/themes/shop/default/build /app/public/themes/shop/default/build
+COPY --from=node-build /app/public/themes/installer/default/build /app/public/themes/installer/default/build
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 RUN composer install --no-dev --optimize-autoloader --no-interaction
+
+RUN mkdir -p public/fonts \
+    && curl -fsSL -o public/fonts/NotoSansSC-Regular.ttf https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansSC/NotoSansSC-Regular.ttf \
+    && curl -fsSL -o public/fonts/NotoSansSC-Bold.ttf https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansSC/NotoSansSC-Bold.ttf \
+    && curl -fsSL -o public/fonts/NotoSansJP-Regular.ttf https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansJP/NotoSansJP-Regular.ttf \
+    && curl -fsSL -o public/fonts/NotoSansJP-Bold.ttf https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansJP/NotoSansJP-Bold.ttf \
+    && curl -fsSL -o public/fonts/NotoSansBengali-Regular.ttf https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansBengali/NotoSansBengali-Regular.ttf \
+    && curl -fsSL -o public/fonts/NotoSansBengali-Bold.ttf https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansBengali/NotoSansBengali-Bold.ttf \
+    && curl -fsSL -o public/fonts/NotoSansSinhala-Regular.ttf https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansSinhala/NotoSansSinhala-Regular.ttf \
+    && curl -fsSL -o public/fonts/NotoSansSinhala-Bold.ttf https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansSinhala/NotoSansSinhala-Bold.ttf
 
 CMD ["sh", "-c", "php artisan migrate --force && php -S 0.0.0.0:${PORT:-8080} -t public"]

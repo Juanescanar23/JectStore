@@ -16,6 +16,10 @@ yarn-error.log*
 
 vendor
 
+public/build
+public/fonts
+public/themes/**/build
+
 storage/logs
 storage/framework/cache
 storage/framework/sessions
@@ -24,6 +28,7 @@ storage/framework/views
 bootstrap/cache
 
 tests
+packages/**/tests
 docs
 *.md
 
