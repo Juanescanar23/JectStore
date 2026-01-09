@@ -72,14 +72,4 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-RUN mkdir -p public/fonts \
-    && curl -fsSL -o public/fonts/NotoSansSC-Regular.ttf https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansSC/NotoSansSC-Regular.ttf \
-    && curl -fsSL -o public/fonts/NotoSansSC-Bold.ttf https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansSC/NotoSansSC-Bold.ttf \
-    && curl -fsSL -o public/fonts/NotoSansJP-Regular.ttf https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansJP/NotoSansJP-Regular.ttf \
-    && curl -fsSL -o public/fonts/NotoSansJP-Bold.ttf https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansJP/NotoSansJP-Bold.ttf \
-    && curl -fsSL -o public/fonts/NotoSansBengali-Regular.ttf https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansBengali/NotoSansBengali-Regular.ttf \
-    && curl -fsSL -o public/fonts/NotoSansBengali-Bold.ttf https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansBengali/NotoSansBengali-Bold.ttf \
-    && curl -fsSL -o public/fonts/NotoSansSinhala-Regular.ttf https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansSinhala/NotoSansSinhala-Regular.ttf \
-    && curl -fsSL -o public/fonts/NotoSansSinhala-Bold.ttf https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansSinhala/NotoSansSinhala-Bold.ttf
-
 CMD ["sh", "-c", "php artisan migrate --force && php -S 0.0.0.0:${PORT:-8080} -t public"]
