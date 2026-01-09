@@ -33,6 +33,7 @@ RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framewor
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
+    ca-certificates \
     git \
     unzip \
     libcurl4-openssl-dev \
@@ -59,7 +60,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 RUN pecl install redis \
     && docker-php-ext-enable redis
 
-COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 COPY . .
 COPY --from=node-build /app/public/build /app/public/build
